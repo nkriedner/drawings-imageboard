@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nils Loves To Draw</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header>
+        <h1>Nils loves to draw!</h1>
+        <h2>Latest Images</h2>
+    </header>
+    <div id="main">
+        <form class="upload-form">
+            <h3>Upload an image:</h3>
+            <input v-model="title" type="text" name="title" placeholder="title">
+            <input v-model="description" type="text" name="description" placeholder="description">
+            <input v-model="username" type="text" name="username" placeholder="username">
+            <input @change="handleChange" type="file" name="file" id="file" accept="image/*" class="inputfile">
+            <!-- <label for="file">Select an image</label> -->
+            <button @click.prevent="submitFile">Upload</button>
+        </form>
+        <div class="image-container">
+            <figure v-for="image in loadedImages">
+                <!-- new (without @click)-->
+                <a v-bind:href="'#'+image.id">
+                    <img v-bind:src="image.url" v-bind:key="image.id"/>
+                    <figcaption>{{image.title}}</figcaption>  
+                </a>
+                <!-- <- new end -->
+                <!-- old -->
+                <!-- <img @click="toggleImage(image.id)" v-bind:src="image.url" v-bind:key="image.id"/>
+                <figcaption>{{image.title}}</figcaption>                 -->
+                <!-- <- old ende -->
+            </figure>
+        </div>
+        <modal-component :image-id="imageId" v-if="imageId" @close="closeModal"></modal-component>
+        <div class="show-more-images" @click="showMoreImages">Show More Images</div>
+    </div>
+
+    <!-- Modal template -->
+    <script id="modal-template" type="text/x-template">
+        <div class="outer-wrapper">
+            <div class="modal-wrapper">
+                <span @click="closeModal" class="modal-closer">X</span><!-- Closing X button -->
+                <img :src="url" alt="chosen image">
+                <div class="modal-text">
+                    <h2 v-if="title">{{title}}</h2>
+                    <p v-if="description">{{description}}</p>
+                    <p v-if="username">Added by {{username}} on {{created_at}}</p>
+                    <p v-else>Added on {{created_at}}</p>
+                    <comment-component :image-id="imageId"></comment-component>
+
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <!-- Comments template -->
+    <script id="comments-template" type="text/x-template">
+        <div class="comments-wrapper">
+            <h2>Add a comment!</h2>
+            <!-- <h5>(Comment Styling inspired by and dedicated to Merle)</h5> -->
+            <form>
+                <div>
+                    <label for="comment">Comment:&nbsp;</label>
+                    <input id="comment" type="text" v-model="comment" name="comment">
+                </div>
+                <div>
+                    <label for="username">Username:&nbsp;</label>
+                    <input id="username" type="text" v-model="username" name="username">
+                </div>
+                <button @click.prevent="submitComment">Submit Comment</button>
+            </form>
+            <div v-if="comments.length > 0">
+                <div v-for="comment in comments" v-bind:key="comment.id">
+                    <p>{{ comment.comment_text }}</p>
+                    <p>Written by {{ comment.username }}, {{comment.created_at}}</p>
+                    <br><br>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script src="/js/vue.js"></script>
+    <script src="/js/axios.min.js"></script>
+    <script src="/js/script.js"></script>
+</body>
+</html>
